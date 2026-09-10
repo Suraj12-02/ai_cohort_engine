@@ -99,7 +99,7 @@ def load_settings() -> Settings:
         groq_api_key=_get("GROQ_API_KEY"),
         groq_model=_get(
             "GROQ_MODEL",
-            "llama-3.3-70b-versatile"
+            "openai/gpt-oss-120b"
         ),
 
         app_env=_get(
