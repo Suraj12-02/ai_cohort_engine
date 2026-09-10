@@ -1,5 +1,5 @@
 # AI Customer Cohort & Query Optimization Engine
-
+[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Streamlit-red?style=for-the-badge)](https://ai-cohort-engine.streamlit.app/)
 A production-style, full-stack data engineering + Gen AI portfolio project:
 synthetic retail data at scale (1M–10M rows), SQL performance benchmarking
 (unindexed → indexed, ~12s → ~150ms), a LangChain-powered Text-to-SQL /
