@@ -16,7 +16,7 @@ CREATE TABLE customers (
     email                VARCHAR(120) NOT NULL,
     signup_date          DATE         NOT NULL,
     city                 VARCHAR(80),
-    state                VARCHAR(80),
+    state                VARCHAR(80),  
     country              VARCHAR(80),
     age                  SMALLINT,
     gender               VARCHAR(20),

@@ -43,13 +43,7 @@ def get_engine() -> Engine:
 @contextmanager
 def get_psycopg2_conn():
     """Raw psycopg2 connection — used for COPY loads and EXPLAIN ANALYZE."""
-    conn = psycopg2.connect(
-        host=settings.db_host,
-        port=settings.db_port,
-        dbname=settings.db_name,
-        user=settings.db_user,
-        password=settings.db_password,
-    )
+    conn = psycopg2.connect(settings.database_url)
     try:
         yield conn
     finally:
