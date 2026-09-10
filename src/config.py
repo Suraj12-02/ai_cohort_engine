@@ -2,9 +2,9 @@
 Central configuration for the AI Customer Cohort & Query Optimization Engine.
 
 Reads from environment variables (.env via python-dotenv) first, and falls
-back to Streamlit secrets (st.secrets) when running inside Streamlit Cloud,
-so the same code works locally and when deployed.
+back to Streamlit secrets (st.secrets) when running inside Streamlit Cloud.
 """
+
 from __future__ import annotations
 
 import os
@@ -16,17 +16,26 @@ load_dotenv()
 
 
 def _get(key: str, default: str | None = None) -> str | None:
-    """Fetch a config value from env first, then st.secrets if available."""
+    """Fetch a config value from environment variables, then Streamlit secrets."""
+
+    # 1. Check environment variables / .env
     val = os.getenv(key)
     if val:
         return val
+
+    # 2. Check Streamlit Cloud secrets
     try:
-        import streamlit as st  # imported lazily; not required for CLI usage
+        import streamlit as st
 
         if key in st.secrets:
-            return st.secrets[key]
+            value = st.secrets[key]
+            if value:
+                return str(value)
+
     except Exception:
         pass
+
+    # 3. Use default value
     return default
 
 
@@ -53,14 +62,23 @@ class Settings:
 
 
 def load_settings() -> Settings:
+
     db_host = _get("DB_HOST", "localhost")
     db_port = _get("DB_PORT", "5432")
     db_name = _get("DB_NAME", "cohort_engine")
     db_user = _get("DB_USER", "postgres")
     db_password = _get("DB_PASSWORD", "postgres")
 
-    default_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-    database_url = _get("DATABASE_URL", default_url)
+    # Get DATABASE_URL directly.
+    # Do NOT silently create a localhost URL.
+    database_url = _get("DATABASE_URL")
+
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL is not configured. "
+            "Add DATABASE_URL to your .env file locally "
+            "or Streamlit Cloud Secrets when deployed."
+        )
 
     return Settings(
         database_url=database_url,
@@ -69,13 +87,30 @@ def load_settings() -> Settings:
         db_name=db_name,
         db_user=db_user,
         db_password=db_password,
+
         llm_provider=_get("LLM_PROVIDER", "groq"),
+
         openai_api_key=_get("OPENAI_API_KEY"),
-        openai_model=_get("OPENAI_MODEL", "gpt-4o-mini"),
+        openai_model=_get(
+            "OPENAI_MODEL",
+            "gpt-4o-mini"
+        ),
+
         groq_api_key=_get("GROQ_API_KEY"),
-        groq_model=_get("GROQ_MODEL", "llama-3.3-70b-versatile"),
-        app_env=_get("APP_ENV", "development"),
-        log_level=_get("LOG_LEVEL", "INFO"),
+        groq_model=_get(
+            "GROQ_MODEL",
+            "llama-3.3-70b-versatile"
+        ),
+
+        app_env=_get(
+            "APP_ENV",
+            "development"
+        ),
+
+        log_level=_get(
+            "LOG_LEVEL",
+            "INFO"
+        ),
     )
 
 
