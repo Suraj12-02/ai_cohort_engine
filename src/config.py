@@ -115,3 +115,9 @@ def load_settings() -> Settings:
 
 
 settings = load_settings()
+
+
+print("DEBUG GROQ KEY EXISTS:", bool(settings.groq_api_key))
+print("DEBUG LLM PROVIDER:", settings.llm_provider)
+print("DEBUG GROQ MODEL:", settings.groq_model)
+
