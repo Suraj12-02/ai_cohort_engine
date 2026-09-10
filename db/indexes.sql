@@ -19,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_customer_date_amount
 -- churn windows; keeps the index smaller and faster to scan.
 CREATE INDEX IF NOT EXISTS idx_orders_recent
     ON orders (order_date)
-    WHERE order_date > (CURRENT_DATE - INTERVAL '400 days');
+    WHERE order_date > DATE '2024-01-01';
 
 -- Q3: campaign engagement join/filter/group
 CREATE INDEX IF NOT EXISTS idx_engagements_customer_id

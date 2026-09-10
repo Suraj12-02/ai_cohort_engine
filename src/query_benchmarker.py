@@ -85,24 +85,25 @@ QUERIES = {
     """,
 }
 
-
 def drop_all_indexes() -> None:
     """Drop non-PK indexes so a fresh 'before' run is truly unindexed."""
-    drop_sql = """
-    DO $$
-    DECLARE
-        r RECORD;
-    BEGIN
-        FOR r IN
-            SELECT indexname FROM pg_indexes
-            WHERE schemaname = 'public'
-              AND indexname NOT LIKE '%_pkey'
-        LOOP
-            EXECUTE 'DROP INDEX IF EXISTS ' || quote_ident(r.indexname);
-        END LOOP;
-    END $$;
-    """
-    execute_ddl(drop_sql)
+    with get_psycopg2_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT indexname
+                FROM pg_indexes
+                WHERE schemaname = 'public'
+                  AND indexname NOT LIKE '%_pkey'
+            """)
+
+            indexes = [row[0] for row in cur.fetchall()]
+
+            for index_name in indexes:
+                safe_name = index_name.replace('"', '""')
+                cur.execute(f'DROP INDEX IF EXISTS "{safe_name}"')
+
+        conn.commit()
+
     print("Dropped all non-primary-key indexes for a clean 'before' benchmark.")
 
 
